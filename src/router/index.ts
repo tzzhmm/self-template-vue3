@@ -22,6 +22,14 @@ const router = createRouter({
         title: '404',
       },
     },
+    {
+      path: '/selfDemo',
+      name: 'selfDemo',
+      component: () => import('@/views/selfDemo/index.vue'),
+      meta: {
+        // router other information
+      },
+    },
   ],
   scrollBehavior() {
     return { top: 0 };

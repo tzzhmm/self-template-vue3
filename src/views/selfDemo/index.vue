@@ -1,6 +1,22 @@
 ﻿<script setup lang="ts">
 type PaddleOcrModule = typeof import('@paddlejs-models/ocr');
 type ModelState = 'idle' | 'loading' | 'ready' | 'error';
+type SelectedFileKind = 'none' | 'image' | 'pdf';
+type PaddleGlobalScope = typeof globalThis & {
+  Module?: Record<string, unknown>;
+};
+
+const ACCEPTED_IMAGE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.bmp', '.gif'];
+const ACCEPTED_FILE_TYPES = [
+  ...ACCEPTED_IMAGE_EXTENSIONS,
+  '.pdf',
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/bmp',
+  'image/gif',
+  'application/pdf',
+].join(',');
 
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const previewImageRef = ref<HTMLImageElement | null>(null);
@@ -8,9 +24,10 @@ const overlayCanvasRef = ref<HTMLCanvasElement | null>(null);
 
 const previewUrl = ref('');
 const selectedFile = ref<File | null>(null);
+const selectedFileKind = ref<SelectedFileKind>('none');
 const imageLoaded = ref(false);
 const isRecognizing = ref(false);
-const statusMessage = ref('请选择一张图片后开始识别');
+const statusMessage = ref('请选择图片或 PDF 文件');
 const errorMessage = ref('');
 const recognizedLines = ref<string[]>([]);
 const rawResult = ref('');
@@ -19,7 +36,11 @@ const modelState = ref<ModelState>('idle');
 
 const recognizedTextValue = computed(() => recognizedLines.value.join('\n'));
 const canRecognize = computed(
-  () => Boolean(selectedFile.value) && imageLoaded.value && !isRecognizing.value,
+  () =>
+    selectedFileKind.value === 'image' &&
+    Boolean(selectedFile.value) &&
+    imageLoaded.value &&
+    !isRecognizing.value,
 );
 const modelTagText = computed(() => {
   switch (modelState.value) {
@@ -47,6 +68,13 @@ const modelTagColor = computed(() => {
 });
 
 let ocrModulePromise: Promise<PaddleOcrModule> | null = null;
+
+const ensurePaddleGlobals = () => {
+  const paddleGlobal = globalThis as PaddleGlobalScope;
+  if (!paddleGlobal.Module) {
+    paddleGlobal.Module = {};
+  }
+};
 
 const revokePreviewUrl = () => {
   if (!previewUrl.value) return;
@@ -100,6 +128,33 @@ const handleImageLoad = () => {
   statusMessage.value = '图片已加载，可以开始识别';
 };
 
+const getFileExtension = (fileName: string) => {
+  const lastDotIndex = fileName.lastIndexOf('.');
+  return lastDotIndex === -1 ? '' : fileName.slice(lastDotIndex).toLowerCase();
+};
+
+const resolveFileKind = (file: File): SelectedFileKind => {
+  const extension = getFileExtension(file.name);
+  const fileType = file.type.toLowerCase();
+
+  if (
+    ACCEPTED_IMAGE_EXTENSIONS.includes(extension) ||
+    fileType === 'image/png' ||
+    fileType === 'image/jpeg' ||
+    fileType === 'image/webp' ||
+    fileType === 'image/bmp' ||
+    fileType === 'image/gif'
+  ) {
+    return 'image';
+  }
+
+  if (extension === '.pdf' || fileType === 'application/pdf') {
+    return 'pdf';
+  }
+
+  return 'none';
+};
+
 const normalizeText = (text?: string | string[]) => {
   if (Array.isArray(text)) {
     return text.map((item) => item.trim()).filter(Boolean);
@@ -122,6 +177,7 @@ const ensureOcrModule = async () => {
       statusMessage.value =
         '正在加载 Paddle.js OCR 模型，首次识别会下载官方模型文件，请稍候';
 
+      ensurePaddleGlobals();
       await import('@paddlejs/paddlejs-backend-webgl');
       const ocr = await import('@paddlejs-models/ocr');
       await ocr.init();
@@ -145,8 +201,15 @@ const handleFileChange = (event: Event) => {
 
   if (!file) return;
 
-  if (!file.type.startsWith('image/')) {
-    errorMessage.value = '请选择 PNG、JPG、JPEG、WEBP 这类图片文件';
+  const fileKind = resolveFileKind(file);
+
+  if (fileKind === 'none') {
+    selectedFileKind.value = 'none';
+    selectedFile.value = null;
+    revokePreviewUrl();
+    imageLoaded.value = false;
+    clearRecognitionResult();
+    errorMessage.value = '只允许上传 PNG、JPG、JPEG、WEBP、BMP、GIF 图片或 PDF 文件';
     statusMessage.value = '文件类型不支持';
     input.value = '';
     return;
@@ -154,15 +217,25 @@ const handleFileChange = (event: Event) => {
 
   revokePreviewUrl();
   selectedFile.value = file;
+  selectedFileKind.value = fileKind;
   previewUrl.value = URL.createObjectURL(file);
-  imageLoaded.value = false;
-  clearRecognitionResult('图片已选择，等待识别');
+  imageLoaded.value = fileKind !== 'image';
+  clearRecognitionResult(
+    fileKind === 'image'
+      ? '图片已选择，等待识别'
+      : 'PDF 已选择，当前页面仅支持图片 OCR，PDF 可先用于上传与预览',
+  );
   input.value = '';
 };
 
 const handleRecognize = async () => {
   const image = previewImageRef.value;
   const canvas = overlayCanvasRef.value;
+
+  if (selectedFileKind.value !== 'image') {
+    errorMessage.value = '当前识别功能仅支持图片，PDF 文件暂不参与 OCR';
+    return;
+  }
 
   if (!selectedFile.value || !image) {
     errorMessage.value = '请先选择一张图片';
@@ -210,8 +283,9 @@ const handleRecognize = async () => {
 const resetDemo = () => {
   revokePreviewUrl();
   selectedFile.value = null;
+  selectedFileKind.value = 'none';
   imageLoaded.value = false;
-  clearRecognitionResult('请选择一张图片后开始识别');
+  clearRecognitionResult('请选择图片或 PDF 文件');
 };
 
 onBeforeUnmount(() => {
@@ -226,20 +300,20 @@ onBeforeUnmount(() => {
         <a-tag :color="modelTagColor" bordered>{{ modelTagText }}</a-tag>
         <div class="space-y-2">
           <h1 class="text-3xl font-semibold tracking-tight text-slate-900">
-            Paddle.js 图片文字识别 Demo
+            Paddle.js 文件上传与图片文字识别 Demo
           </h1>
           <p class="max-w-3xl text-sm leading-6 text-slate-500 sm:text-base">
             当前页面通过官方
             <code>@paddlejs-models/ocr</code>
             和
             <code>@paddlejs/paddlejs-backend-webgl</code>
-            接入 OCR。首次识别时会加载官方模型文件，所以会比后续识别稍慢一些。
+            接入 OCR。当前只允许上传主流图片格式和 PDF 文件，其中图片可继续走 OCR 识别。
           </p>
         </div>
       </section>
 
       <a-alert type="info" show-icon>
-        先上传一张带文字的图片，再点击“开始识别”。识别完成后，左侧图片会叠加文字框，右侧会显示提取出的文本和原始返回数据。
+        先上传图片或 PDF 文件。当前“开始识别”按钮仅对图片可用；PDF 先用于上传与预览，不会进入 OCR 识别链路。
       </a-alert>
 
       <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -247,14 +321,14 @@ onBeforeUnmount(() => {
           <div class="space-y-4">
             <input
               ref="fileInputRef"
-              accept="image/*"
+              :accept="ACCEPTED_FILE_TYPES"
               class="hidden"
               type="file"
               @change="handleFileChange"
             />
 
             <div class="flex flex-wrap gap-3">
-              <a-button type="primary" @click="openFileDialog">选择图片</a-button>
+              <a-button type="primary" @click="openFileDialog">选择文件</a-button>
               <a-button
                 :disabled="!canRecognize"
                 :loading="isRecognizing"
@@ -268,9 +342,9 @@ onBeforeUnmount(() => {
             </div>
 
             <div class="flex flex-wrap gap-2 text-xs text-slate-500">
-              <a-tag bordered color="#e5e6eb">支持常见图片格式</a-tag>
+              <a-tag bordered color="#e5e6eb">支持 PNG、JPG、JPEG、WEBP、BMP、GIF、PDF</a-tag>
               <a-tag bordered color="#e5e6eb">推荐清晰截图或文档照片</a-tag>
-              <a-tag bordered color="#e5e6eb">识别框会直接绘制到预览图层</a-tag>
+              <a-tag bordered color="#e5e6eb">OCR 目前仅对图片启用</a-tag>
             </div>
 
             <a-alert v-if="errorMessage" type="error" show-icon>
@@ -281,7 +355,7 @@ onBeforeUnmount(() => {
             </a-alert>
 
             <div class="rounded-2xl border border-dashed border-slate-300 bg-slate-100/80 p-4 sm:p-6">
-              <div v-if="previewUrl" class="flex justify-center">
+              <div v-if="previewUrl && selectedFileKind === 'image'" class="flex justify-center">
                 <div class="relative inline-block max-w-full overflow-hidden rounded-xl bg-white shadow-sm">
                   <img
                     ref="previewImageRef"
@@ -297,17 +371,32 @@ onBeforeUnmount(() => {
                 </div>
               </div>
 
+              <div v-else-if="previewUrl && selectedFileKind === 'pdf'" class="space-y-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-4 text-slate-600 shadow-sm">
+                  <p class="text-sm font-medium text-slate-800">已选择 PDF 文件</p>
+                  <p class="mt-2 break-all text-sm">{{ selectedFile?.name }}</p>
+                  <p class="mt-3 text-xs leading-5 text-slate-500">
+                    当前页面只做 PDF 上传与预览支持，不会对 PDF 直接执行 OCR。
+                  </p>
+                </div>
+                <iframe
+                  :src="previewUrl"
+                  class="h-[560px] w-full rounded-xl border border-slate-200 bg-white"
+                  title="PDF preview"
+                />
+              </div>
+
               <div
                 v-else
                 class="flex min-h-[360px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white px-6 text-center text-slate-500"
               >
                 <div class="space-y-2">
-                  <h2 class="text-lg font-medium text-slate-700">还没有选择图片</h2>
+                  <h2 class="text-lg font-medium text-slate-700">还没有选择文件</h2>
                   <p class="max-w-md text-sm leading-6">
-                    建议选择文字较清晰、背景对比明显的截图、文档照片或票据照片，这样更容易看出 Paddle.js OCR 的识别效果。
+                    支持上传主流图片格式和 PDF。图片会进入 OCR 识别流程，PDF 会在当前区域完成预览展示。
                   </p>
                 </div>
-                <a-button type="outline" @click="openFileDialog">上传一张图片试试</a-button>
+                <a-button type="outline" @click="openFileDialog">上传文件试试</a-button>
               </div>
             </div>
           </div>
@@ -319,7 +408,7 @@ onBeforeUnmount(() => {
               <div class="rounded-xl bg-slate-50 p-4">
                 <p class="text-xs uppercase tracking-[0.2em] text-slate-400">当前文件</p>
                 <p class="mt-3 break-all text-sm font-medium text-slate-700">
-                  {{ selectedFile?.name || '未选择图片' }}
+                  {{ selectedFile?.name || '未选择文件' }}
                 </p>
               </div>
               <div class="rounded-xl bg-slate-50 p-4">

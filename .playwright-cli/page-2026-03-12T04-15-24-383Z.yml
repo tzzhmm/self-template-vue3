@@ -1,0 +1,54 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - generic [ref=e7]: 模型未加载
+    - generic [ref=e8]:
+      - heading "Paddle.js 图片文字识别 Demo" [level=1] [ref=e9]
+      - paragraph [ref=e10]:
+        - text: 当前页面通过官方
+        - code [ref=e11]: "@paddlejs-models/ocr"
+        - text: 和
+        - code [ref=e12]: "@paddlejs/paddlejs-backend-webgl"
+        - text: 接入 OCR。首次识别时会加载官方模型文件，所以会比后续识别稍慢一些。
+  - alert [ref=e13]:
+    - img [ref=e15]
+    - generic [ref=e18]: 先上传一张带文字的图片，再点击“开始识别”。识别完成后，左侧图片会叠加文字框，右侧会显示提取出的文本和原始返回数据。
+  - generic [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e22]: 上传与预览
+      - generic [ref=e24]:
+        - generic [ref=e25]:
+          - button "选择图片" [ref=e26] [cursor=pointer]
+          - button "开始识别" [disabled] [ref=e27]
+          - button "清空内容" [disabled] [ref=e28]
+        - generic [ref=e29]:
+          - generic [ref=e30]: 支持常见图片格式
+          - generic [ref=e31]: 推荐清晰截图或文档照片
+          - generic [ref=e32]: 识别框会直接绘制到预览图层
+        - alert [ref=e33]:
+          - img [ref=e35]
+          - generic [ref=e38]: 请选择一张图片后开始识别
+        - generic [ref=e40]:
+          - generic [ref=e41]:
+            - heading "还没有选择图片" [level=2] [ref=e42]
+            - paragraph [ref=e43]: 建议选择文字较清晰、背景对比明显的截图、文档照片或票据照片，这样更容易看出 Paddle.js OCR 的识别效果。
+          - button "上传一张图片试试" [ref=e44] [cursor=pointer]
+    - generic [ref=e45]:
+      - generic [ref=e47]: 识别结果
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: 当前文件
+            - paragraph [ref=e53]: 未选择图片
+          - generic [ref=e54]:
+            - paragraph [ref=e55]: 文本框数量
+            - paragraph [ref=e56]: "0"
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - heading "识别文本" [level=2] [ref=e59]
+            - generic [ref=e60]: 0 段
+          - textbox "识别到的文字会显示在这里" [ref=e62]
+        - generic [ref=e63]:
+          - generic [ref=e64]:
+            - heading "原始返回结果" [level=2] [ref=e65]
+            - generic [ref=e66]: 方便你继续做业务封装
+          - textbox "Paddle.js 返回的 points、text 等原始数据会显示在这里" [ref=e68]

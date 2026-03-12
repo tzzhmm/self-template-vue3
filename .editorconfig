@@ -1,4 +1,4 @@
-# EditorConfig is awesome: https://EditorConfig.org
+﻿# EditorConfig is awesome: https://EditorConfig.org
 
 # top-most EditorConfig file
 root = true
@@ -7,6 +7,6 @@ root = true
 indent_style = space              # 缩进风格，可选配置有space和tab
 indent_size = 2                   # 缩进大小
 end_of_line = lf                  # 换行符，可选配置有lf、cr和crlf
-charset = utf-8                   # 编码格式，通常都是选utf-8
+charset = utf-8-bom               # 编码格式，通常都使用 utf-8 with BOM
 trim_trailing_whitespace = true   # 去除多余的空格
 insert_final_newline = true       # 在尾部插入一行

@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
   // 每一行的宽度(显示的字符数)
   printWidth: 80,
 

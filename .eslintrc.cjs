@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
   root: true,
   // 它是专门针对 Vue 单文件组件编写的解析器
   parser: 'vue-eslint-parser',

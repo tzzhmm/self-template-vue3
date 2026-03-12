@@ -1,4 +1,4 @@
-# Vite4 + Vue3 + Typescript
+﻿# Vite4 + Vue3 + Typescript
 
 ## 介绍
 基于 Vue3、Vite4 和 Typescript 搭建的项目模板，帮你更快更好的创建功能完善的模板，其中使用到的库和依赖皆为最新版本，并在之后持续更新！！！

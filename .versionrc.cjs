@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
   "types": [
     { "type": "feat", "section": "✨ Features | 新功能" },
     { "type": "fix", "section": "🐛 Bug Fixes | Bug 修复" },

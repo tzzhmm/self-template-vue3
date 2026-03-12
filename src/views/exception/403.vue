@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 const router = useRouter();
 const back = () => {
   router.go(-1);

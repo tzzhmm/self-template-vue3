@@ -1,4 +1,4 @@
-import axios, {
+﻿import axios, {
   AxiosResponse,
   AxiosError,
   InternalAxiosRequestConfig,
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
   baseURL: BASE_URL_PREFIX,
   timeout: 1000 * 30,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json;charset=utf-8',
   },
 });
 

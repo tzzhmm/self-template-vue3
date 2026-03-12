@@ -1,3 +1,12 @@
+﻿/*
+ * @Author: tiankailong tzzhmmcc@163.com
+ * @Date: 2026-03-02 16:58:55
+ * @LastEditors: tiankailong tzzhmmcc@163.com
+ * @LastEditTime: 2026-03-11 17:14:06
+ * @FilePath: src\router\index.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开 koroFileHeader 查看配置 
+ * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { createRouter, createWebHistory } from 'vue-router';
 import appRoutes from './modules-index';
 import createRouterGuard from './guard';
@@ -7,8 +16,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/views/home/index.vue'),
+      name: 'selfDemo',
+      component: () => import('@/views/selfDemo/index.vue'),
       meta: {
         // router other information
       },
@@ -22,10 +31,18 @@ const router = createRouter({
         title: '404',
       },
     },
+    // {
+    //   path: '/selfDemo',
+    //   name: 'selfDemo',
+    //   component: () => import('@/views/selfDemo/index.vue'),
+    //   meta: {
+    //     // router other information
+    //   },
+    // },
     {
-      path: '/selfDemo',
-      name: 'selfDemo',
-      component: () => import('@/views/selfDemo/index.vue'),
+      path: '/home',
+      name: 'home',
+      component: () => import('@/views/home/index.vue'),
       meta: {
         // router other information
       },

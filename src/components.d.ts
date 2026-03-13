@@ -9,16 +9,9 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    AAlert: typeof import('@arco-design/web-vue')['Alert']
     AButton: typeof import('@arco-design/web-vue')['Button']
-    ACard: typeof import('@arco-design/web-vue')['Card']
     AConfigProvider: typeof import('@arco-design/web-vue')['ConfigProvider']
-    ADivider: typeof import('@arco-design/web-vue')['Divider']
-    ALink: typeof import('@arco-design/web-vue')['Link']
-    AResult: typeof import('@arco-design/web-vue')['Result']
-    ATag: typeof import('@arco-design/web-vue')['Tag']
-    ATextarea: typeof import('@arco-design/web-vue')['Textarea']
-    ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
+    ATable: typeof import('@arco-design/web-vue')['Table']
     AUpload: typeof import('@arco-design/web-vue')['Upload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

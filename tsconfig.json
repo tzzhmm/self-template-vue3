@@ -1,4 +1,4 @@
-﻿{
+{
   "compilerOptions": {
     "target": "ESNext",
     "useDefineForClassFields": true,
@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
+    "allowJs": true,
     "noEmit": true,
     // 引用文件时区分文件名大小写
     "forceConsistentCasingInFileNames": true,

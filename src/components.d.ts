@@ -19,6 +19,7 @@ declare module '@vue/runtime-core' {
     ATag: typeof import('@arco-design/web-vue')['Tag']
     ATextarea: typeof import('@arco-design/web-vue')['Textarea']
     ATooltip: typeof import('@arco-design/web-vue')['Tooltip']
+    AUpload: typeof import('@arco-design/web-vue')['Upload']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

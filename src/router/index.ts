@@ -2,7 +2,7 @@
  * @Author: tiankailong tzzhmmcc@163.com
  * @Date: 2026-03-02 16:58:55
  * @LastEditors: tiankailong tzzhmmcc@163.com
- * @LastEditTime: 2026-03-11 17:14:06
+ * @LastEditTime: 2026-03-13 16:45:08
  * @FilePath: src\router\index.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开 koroFileHeader 查看配置 
  * 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
@@ -16,8 +16,8 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'selfDemo',
-      component: () => import('@/views/selfDemo/index.vue'),
+      name: 'ocrDemo',
+      component: () => import('@/views/ocrDemo/index.vue'),
       meta: {
         // router other information
       },
@@ -31,14 +31,6 @@ const router = createRouter({
         title: '404',
       },
     },
-    // {
-    //   path: '/selfDemo',
-    //   name: 'selfDemo',
-    //   component: () => import('@/views/selfDemo/index.vue'),
-    //   meta: {
-    //     // router other information
-    //   },
-    // },
     {
       path: '/home',
       name: 'home',
@@ -47,6 +39,14 @@ const router = createRouter({
         // router other information
       },
     },
+    {
+      path: '/selfDemo',
+      name: 'selfDemo',
+      component: () => import('@/views/selfDemo/index.vue'),
+      meta: {
+        // router other information
+      },
+    }
   ],
   scrollBehavior() {
     return { top: 0 };

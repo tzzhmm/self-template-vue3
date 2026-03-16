@@ -1,4 +1,12 @@
-﻿import { defineConfig, loadEnv } from 'vite';
+﻿/*
+ * @Author: tiankailong tzzhmmcc@163.com
+ * @Date: 2026-03-02 16:58:56
+ * @LastEditors: tiankailong tzzhmmcc@163.com
+ * @LastEditTime: 2026-03-16 10:35:00
+ * @FilePath: \workflow-webf:\LTProject\self-template-vue3\vite.config.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+import { defineConfig, loadEnv } from 'vite';
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
 import AutoImport from 'unplugin-auto-import/vite';
@@ -19,17 +27,18 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_TARGET;
 
   return {
+    envPrefix: ['VUE_APP_', 'VITE_'],
     server: {
       host: true, // 可以以IP访问
       port: 8080, // 端口
       open: true, // 自动打开游览器
       cors: true, // 允许跨域
       proxy: {
-        '/api': {
-          target: apiTarget,  // 从 .env.development / .env.production 读取
-          changeOrigin: true,
-          rewrite: (path) => path.replace('/api/', '/'),
-        },
+        // '/api': {
+        //   target: apiTarget,  // 从 .env.development / .env.production 读取
+        //   changeOrigin: true,
+        //   rewrite: (path) => path.replace('/api/', '/'),
+        // },
       },
     },
     build: {
